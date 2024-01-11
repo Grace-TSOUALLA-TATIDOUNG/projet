@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte du Monde avec D3.js</title>
+    <style>
+        path {
+            fill: #ccc;
+            stroke: #fff;
+            stroke-width: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+
+        // Définir les dimensions de la carte
+        var width =1200;
+        var height = 700;  // Augmentez la hauteur pour éviter de couper le haut de la carte
+
+        // Définir la projection
+        var projection = d3.geoMercator()
+            .scale((width + 1) / 2 / Math.PI *0.7)  // Ajuster l'échelle
+            .translate([width / 2, height / 2])
+            .precision(0.1)
+            .center([0, 0]);  // Centrer la carte sur l'équateur, ajustez selon les besoins
+
+        // Appliquer la projection aux chemins des frontières
+        var path = d3.geoPath().projection(projection);
+
+        // Sélectionner le conteneur SVG
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Utiliser D3 pour charger le fichier GeoJSON
+        d3.json("custom.geo.json").then(function(world) {
+            // Utiliser D3 pour créer les chemins des frontières
+            svg.selectAll("path")
+                .data(world.features)
+                .enter().append("path")
+                .attr("d", path);
+        });
+
+    </script>
+</body>
+</html>
