@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,76 +26,76 @@
   <body>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
-      var width = 1500;
-      var height = 1000;
+      var largeur = 1500;
+      var hauteur = 1000;
 
       var projection = d3
         .geoMercator()
-        .scale(((width + 1) / 2 / Math.PI) * 0.7)
-        .translate([width / 2, height / 2])
+        .scale(((largeur + 1) / 2 / Math.PI) * 0.7)
+        .translate([largeur / 2, hauteur / 2])
         .precision(0.1)
         .center([0, 0]);
 
-      var path = d3.geoPath().projection(projection);
+      var chemin = d3.geoPath().projection(projection);
 
       var svg = d3
         .select("body")
         .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+        .attr("width", largeur)
+        .attr("height", hauteur);
 
-      d3.csv("FAOSTAT_data_en_1-11-2024.csv").then(function (data) {
-        d3.json("custom.geo.json").then(function (world) {
-          world.features.forEach(function (worldCountry) {
-            var countryData = data.find(function (csvCountry) {
-              return csvCountry["Area"] === worldCountry.properties.name;
+      d3.csv("FAOSTAT_data_en_1-11-2024.csv").then(function (donnees) {
+        d3.json("custom.geo.json").then(function (monde) {
+          monde.features.forEach(function (paysMonde) {
+            var donneesPays = donnees.find(function (csvPays) {
+              return csvPays["Area"] === paysMonde.properties.name;
             });
-            if (countryData) {
-              worldCountry.properties.data = countryData;
+            if (donneesPays) {
+              paysMonde.properties.data = donneesPays;
             }
           });
 
-          var colorScale = d3.scaleSequential(d3.interpolateReds).domain([
-            d3.min(data, function (d) {
+          var echelleCouleur = d3.scaleSequential(d3.interpolateReds).domain([
+            d3.min(donnees, function (d) {
               return +d.Value;
             }),
-            d3.max(data, function (d) {
+            d3.max(donnees, function (d) {
               return +d.Value;
             }),
           ]);
 
           svg
             .selectAll("path")
-            .data(world.features)
+            .data(monde.features)
             .enter()
             .append("path")
-            .attr("d", path)
+            .attr("d", chemin)
             .style("fill", function (d) {
               return d.properties.data
-                ? colorScale(+d.properties.data.Value)
+                ? echelleCouleur(+d.properties.data.Value)
                 : "#6b0000";
             })
             .style("stroke", "#fff")
             .style("stroke-width", 1);
 
           // Légende
-          var legend = svg
-            .selectAll(".legend")
-            .data(colorScale.ticks(6).slice(1))
+          var legende = svg
+            .selectAll(".legende")
+            .data(echelleCouleur.ticks(6).slice(1))
             .enter()
             .append("g")
-            .attr("class", "legend")
+            .attr("class", "legende")
             .attr("transform", function (d, i) {
-              return "translate(0," + (height - 20 - i * 20) + ")";
+              return "translate(0," + (hauteur - 20 - i * 20) + ")";
             });
 
-          legend
+          legende
             .append("rect")
             .attr("width", 18)
             .attr("height", 18)
-            .style("fill", colorScale);
+            .style("fill", echelleCouleur);
 
-          legend
+          legende
             .append("text")
             .attr("x", 26)
             .attr("y", 9)
