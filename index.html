@@ -1,50 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carte du Monde avec D3.js</title>
     <style>
-        path {
-            fill: #ccc;
-            stroke: #fff;
-            stroke-width: 1;
-        }
-    </style>
-</head>
-<body>
+      path {
+        fill: #6b0000; /* Rouge foncé */
+        stroke: #fff;
+        stroke-width: 1;
+      }
 
+      .legend {
+        font-size: 12px;
+      }
+
+      .legend rect {
+        width: 18px;
+        height: 18px;
+        margin-right: 4px;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
+      var width = 1500;
+      var height = 1000;
 
-        // Définir les dimensions de la carte
-        var width =1200;
-        var height = 700;  // Augmentez la hauteur pour éviter de couper le haut de la carte
+      var projection = d3
+        .geoMercator()
+        .scale(((width + 1) / 2 / Math.PI) * 0.7)
+        .translate([width / 2, height / 2])
+        .precision(0.1)
+        .center([0, 0]);
 
-        // Définir la projection
-        var projection = d3.geoMercator()
-            .scale((width + 1) / 2 / Math.PI *0.7)  // Ajuster l'échelle
-            .translate([width / 2, height / 2])
-            .precision(0.1)
-            .center([0, 0]);  // Centrer la carte sur l'équateur, ajustez selon les besoins
+      var path = d3.geoPath().projection(projection);
 
-        // Appliquer la projection aux chemins des frontières
-        var path = d3.geoPath().projection(projection);
+      var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-        // Sélectionner le conteneur SVG
-        var svg = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height", height);
+      d3.csv("FAOSTAT_data_en_1-11-2024.csv").then(function (data) {
+        d3.json("custom.geo.json").then(function (world) {
+          world.features.forEach(function (worldCountry) {
+            var countryData = data.find(function (csvCountry) {
+              return csvCountry["Area"] === worldCountry.properties.name;
+            });
+            if (countryData) {
+              worldCountry.properties.data = countryData;
+            }
+          });
 
-        // Utiliser D3 pour charger le fichier GeoJSON
-        d3.json("custom.geo.json").then(function(world) {
-            // Utiliser D3 pour créer les chemins des frontières
-            svg.selectAll("path")
-                .data(world.features)
-                .enter().append("path")
-                .attr("d", path);
+          var colorScale = d3.scaleSequential(d3.interpolateReds).domain([
+            d3.min(data, function (d) {
+              return +d.Value;
+            }),
+            d3.max(data, function (d) {
+              return +d.Value;
+            }),
+          ]);
+
+          svg
+            .selectAll("path")
+            .data(world.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .style("fill", function (d) {
+              return d.properties.data
+                ? colorScale(+d.properties.data.Value)
+                : "#6b0000";
+            })
+            .style("stroke", "#fff")
+            .style("stroke-width", 1);
+
+          // Légende
+          var legend = svg
+            .selectAll(".legend")
+            .data(colorScale.ticks(6).slice(1))
+            .enter()
+            .append("g")
+            .attr("class", "legend")
+            .attr("transform", function (d, i) {
+              return "translate(0," + (height - 20 - i * 20) + ")";
+            });
+
+          legend
+            .append("rect")
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", colorScale);
+
+          legend
+            .append("text")
+            .attr("x", 26)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "start")
+            .text(function (d) {
+              return "≥ " + Math.round(d);
+            });
         });
-
+      });
     </script>
-</body>
+  </body>
 </html>
