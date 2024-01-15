@@ -13,6 +13,7 @@
 
     .legend {
       font-size: 12px;
+      
     }
 
     .legend rect {
@@ -85,6 +86,18 @@
     .country.hovered {
       fill-opacity: 1; /* Ajustez l'opacité lors du survol */
     }
+
+    .compass line {
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.compass circle {
+  fill: #000;
+}
+
+
+   
   </style>
 </head>
 <body>
@@ -236,6 +249,40 @@
             d3.select(this).select(".country-label").style("display", "none");
           });
 
+              // Ajout d'une rose des vents stylisée en haut de la carte
+          var compassRadius = 20; // Ajustez la taille de la rose des vents selon vos besoins
+
+          var compass = svg.append("g")
+            .attr("class", "compass")
+            .attr("transform", "translate(" + (largeur / 2) + "," + 20 + ")");
+
+          var directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+
+          // Ajout des lignes représentant les directions cardinales
+          compass.selectAll("line")
+            .data(directions)
+            .enter().append("line")
+            .attr("x1", 0)
+            .attr("y1", -compassRadius)
+            .attr("x2", 0)
+            .attr("y2", -compassRadius + 10)
+            .attr("transform", function(d, i) { return "rotate(" + (i * 45) + ")"; }) // Rotation des lignes
+            .style("stroke", "#000")
+            .style("stroke-width", 2);
+
+          // Ajout des textes représentant les directions cardinales
+          compass.selectAll("text")
+            .data(directions)
+            .enter().append("text")
+            .attr("x", 0)
+            .attr("y", -compassRadius - 15)
+            .attr("dy", function(d, i) { return i * (compassRadius / 4); })
+            .attr("text-anchor", "middle")
+            .text(function(d) { return d; })
+            .style("fill", "#000")
+            .style("font-size", "0px");
+
+
         // Légende
         var legende = svg
           .selectAll(".legende")
@@ -246,6 +293,8 @@
           .attr("transform", function (d, i) {
             return "translate(0," + (hauteur - 20 - i * 20) + ")";
           });
+
+        
 
         legende
           .append("rect")
