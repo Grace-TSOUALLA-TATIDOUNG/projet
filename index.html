@@ -210,9 +210,16 @@
                 d.properties.data.Item === selectedProduct &&
                 d.properties.data["Element Code"] === selectedElement
                 ? echelleCouleur(+d.properties.data.Value)
+                : d.properties.data &&
+                  d.properties.data.Year === selectedYear &&
+                  d.properties.data["Element Code"] === selectedElement
+                ? echelleCouleur(+d.properties.data.Value)
                 : "#6b0000";
             });
           }
+
+
+
 
           // Initialiser la carte avec l'année, le produit et l'élément par défaut
           updateMap(2021, produits[0], elements[0]);
