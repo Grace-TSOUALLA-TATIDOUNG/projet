@@ -21,30 +21,50 @@
         margin-right: 4px;
         opacity: 0.8;
       }
+
+        .container {
+        display: flex; /* Utiliser un conteneur flex pour disposer les éléments en ligne */
+      }
+
+      .box {
+        width: 300px; /* Définir la largeur souhaitée pour chaque boîte */
+        height: 50px;
+        margin: 5px; /* Ajouter une marge entre les boîtes si nécessaire */
+        box-sizing: border-box; /* Inclure la bordure dans la largeur et la hauteur */
+      }
     </style>
   </head>
   <body>
-    <label for="year">Choisir l'année:</label>
-    <input
-      type="range"
-      id="year"
-      name="year"
-      min="2017"
-      max="2021"
-      step="1"
-      value="2021"
-    />
-
-    <label for="product">Choisir le produit:</label>
-    <select id="product" name="product">
-      <!-- Options dynamiques en fonction des données -->
-    </select>
-
-    <label for="element">Choisir l'élément:</label>
-    <select id="element" name="element">
-      <!-- Ajoutez ici les options dynamiques en fonction de vos données -->
-    </select>
-
+    <div class="container">
+      <div class="box">
+        <label for="year">Choisir l'année:</label>
+        <input
+          type="range"
+          id="year"
+          name="year"
+          min="2017"
+          max="2021"
+          step="1"
+          value="2021"
+        /><br />
+        <span id="an">Année : 2021</span>
+      </div>
+      
+      <div class="box">
+        <label for="product">Choisir le produit:</label>
+        <select id="product" name="product">
+          <!-- Options dynamiques en fonction des données -->
+        </select>
+      </div>
+  
+      <div class="box">
+        <label for="element">Choisir l'élément:</label>
+        <select id="element" name="element">
+          <!-- Ajoutez ici les options dynamiques en fonction de vos données -->
+        </select>
+      </div>
+    </div>
+    
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
       var largeur = 1200;
@@ -157,10 +177,12 @@
             });
 
           // Gérez le changement de l'année dans le slider
+          var yText = d3.select("#an");
           d3.select("#year").on("input", function () {
             var selectedYear = this.value;
             var selectedProduct = selectProduct.property("value");
             var selectedElement = selectElement.property("value");
+            yText.text("Année : " + selectedYear);
             updateMap(selectedYear, selectedProduct, selectedElement);
           });
 
