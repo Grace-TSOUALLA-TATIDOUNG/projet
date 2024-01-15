@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carte du Monde avec D3.js</title>
     <style>
+      
       path {
         fill: #6b0000; /* Rouge foncé */
         stroke: #fff;
@@ -22,8 +23,29 @@
         opacity: 0.8;
       }
 
+      .map-container {
+        position: relative;
+      }
+
+      .map {
+        margin-top: 20px;
+        
+       
+      }
+
+      .map-legend {
+        position: relative ;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+       
+      }
+
         .container {
-        display: flex; /* Utiliser un conteneur flex pour disposer les éléments en ligne */
+        position: relative ;
+        display: flex; 
+        left: 300px;
       }
 
       .box {
@@ -35,6 +57,7 @@
     </style>
   </head>
   <body>
+    <div class="map-container">
     <div class="container">
       <div class="box">
         <label for="year">Choisir l'année:</label>
@@ -64,10 +87,18 @@
         </select>
       </div>
     </div>
+      <div id="map" class="map"></div>
+      <!-- Ajout de la légende existante -->
+      <div class="map-legend">
+        <div>
+          <p>Cette carte représente [Expliquez ce que la carte représente].</p>
+        </div>
+      </div>
+    </div>
     
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
-      var largeur = 1200;
+      var largeur = 1500;
       var hauteur = 700;
 
       var projection = d3
