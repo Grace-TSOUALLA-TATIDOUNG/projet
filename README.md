@@ -62,9 +62,9 @@ En annalysant les mise a jours sur github on peut voir que tout les membres du g
 
 ## Progression de la visualisation : 
 
-#### premier teste de la visualisation :
+#### - Premier teste de la visualisation :
 ![image](https://github.com/sunnysunny07/projet/assets/58107179/5c9f6784-dfa3-4959-8f1a-b3aee8693d95)
-#### resultat final : 
+#### - Resultat final : 
 ![image](https://github.com/sunnysunny07/projet/assets/58107179/8f05883a-be16-4388-b1a2-b620788ce63b)
 
 
