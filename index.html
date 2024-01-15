@@ -45,15 +45,39 @@
         .container {
         position: relative ;
         display: flex; 
-        left: 300px;
+        left: 350px;
       }
 
-      .box {
-        width: 300px; /* Définir la largeur souhaitée pour chaque boîte */
-        height: 50px;
-        margin: 5px; /* Ajouter une marge entre les boîtes si nécessaire */
-        box-sizing: border-box; /* Inclure la bordure dans la largeur et la hauteur */
-      }
+      /* style du dropdown */
+
+        .box {
+          margin-right: 5%;
+          margin-top: 5%;
+          transform: translate(-50%, -50%);
+        }
+
+        .box select {
+          background-color: #d22727;
+          color: white;
+          padding: 12px;
+          width: 150px;
+          border: none;
+          font-size: 14px;
+          box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+          -webkit-appearance: button;
+          appearance: button;
+          outline: none;
+        }
+
+        
+        .box:hover::before {
+          color: rgba(255, 255, 255, 0.6);
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .box select option {
+          padding: 30px;
+        }
     </style>
   </head>
   <body>
@@ -145,7 +169,7 @@
             .style("fill", function (d) {
               return d.properties.data
                 ? echelleCouleur(+d.properties.data.Value)
-                : "#6b0000";
+                : "#003e1c";
             })
             .style("stroke", "#fff")
             .style("stroke-width", 1);
