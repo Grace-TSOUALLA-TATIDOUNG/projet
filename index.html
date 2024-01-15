@@ -6,8 +6,8 @@
   <title>Carte du Monde avec D3.js</title>
   <style>
     path {
-      fill: #6b0000; /* Rouge foncé */
-      stroke: #fff;
+      fill: #00261C; 
+      stroke: #97ED8A;
       stroke-width: 1;
     }
 
@@ -26,10 +26,7 @@
       position: relative;
     }
 
-    .map {
-      margin-top: 20px;
-    }
-
+    
     .map-legend {
       position: relative;
       display: flex;
@@ -48,15 +45,15 @@
 
     .box {
       margin-right: 5%;
-      margin-top: 5%;
+      margin-top: 3%;
       transform: translate(-50%, -50%);
     }
 
     .box select {
-      background-color: #d22727;
+      background-color:#044D29;
       color: white;
       padding: 12px;
-      width: 150px;
+      width: 160px;
       border: none;
       font-size: 14px;
       box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
@@ -118,11 +115,11 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
     var largeur = 1500;
-    var hauteur = 700;
+    var hauteur = 525;
 
     var projection = d3
       .geoMercator()
-      .scale(((largeur + 1) / 2 / Math.PI) * 0.7)
+      .scale(((largeur + 1) / 2 / Math.PI) * 0.5)
       .translate([largeur / 2, hauteur / 2])
       .precision(0.1)
       .center([0, 0]);
@@ -146,7 +143,7 @@
           }
         });
 
-        var echelleCouleur = d3.scaleSequential(d3.interpolateReds).domain([
+        var echelleCouleur = d3.scaleSequential(d3.interpolateGreens).domain([
           d3.min(donnees, function (d) {
             return +d.Value;
           }),
@@ -168,6 +165,35 @@
           })
           .style("stroke", "#fff")
           .style("stroke-width", 1);
+
+                  // Dessiner les frontières
+        svg
+          .selectAll(".border")
+          .data(monde.features)
+          .enter()
+          .append("path")
+          .attr("class", "border")
+          .attr("d", chemin)
+          .style("fill", "none")
+          .style("stroke", "#888")
+          .style("stroke-width", 1);
+
+        // Dessiner les pays
+        svg
+          .selectAll(".country")
+          .data(monde.features)
+          .enter()
+          .append("path")
+          .attr("class", "country")
+          .attr("d", chemin)
+          .style("fill", function (d) {
+            return d.properties.data
+              ? echelleCouleur(+d.properties.data.Value)
+              : "#003e1c";
+          })
+          .style("stroke", "#888")
+          .style("stroke-width", 0.2);
+
 
         // Légende
         var legende = svg
@@ -274,7 +300,7 @@ function updateMap(selectedYear, selectedProduct, selectedElement) {
 
     return dataForCountry
       ? echelleCouleur(+dataForCountry.Value)
-      : "#6b0000";
+      : "#00261C";
   });
 }
         // Initialiser la carte avec l'année, le produit et l'élément par défaut
