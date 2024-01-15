@@ -1,87 +1,82 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Carte du Monde avec D3.js</title>
-    <style>
-      
-      path {
-        fill: #6b0000; /* Rouge foncé */
-        stroke: #fff;
-        stroke-width: 1;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte du Monde avec D3.js</title>
+  <style>
+    path {
+      fill: #6b0000; /* Rouge foncé */
+      stroke: #fff;
+      stroke-width: 1;
+    }
 
-      .legend {
-        font-size: 12px;
-      }
+    .legend {
+      font-size: 12px;
+    }
 
-      .legend rect {
-        width: 18px;
-        height: 18px;
-        margin-right: 4px;
-        opacity: 0.8;
-      }
+    .legend rect {
+      width: 18px;
+      height: 18px;
+      margin-right: 4px;
+      opacity: 0.8;
+    }
 
-      .map-container {
-        position: relative;
-      }
+    .map-container {
+      position: relative;
+    }
 
-      .map {
-        margin-top: 20px;
-        
-       
-      }
+    .map {
+      margin-top: 20px;
+    }
 
-      .map-legend {
-        position: relative ;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: white;
-       
-      }
+    .map-legend {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+    }
 
-        .container {
-        position: relative ;
-        display: flex; 
-        left: 350px;
-      }
+    .container {
+      position: relative;
+      display: flex;
+      left: 350px;
+    }
 
-      /* style du dropdown */
+    /* style du dropdown */
 
-        .box {
-          margin-right: 5%;
-          margin-top: 5%;
-          transform: translate(-50%, -50%);
-        }
+    .box {
+      margin-right: 5%;
+      margin-top: 5%;
+      transform: translate(-50%, -50%);
+    }
 
-        .box select {
-          background-color: #d22727;
-          color: white;
-          padding: 12px;
-          width: 150px;
-          border: none;
-          font-size: 14px;
-          box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-          -webkit-appearance: button;
-          appearance: button;
-          outline: none;
-        }
+    .box select {
+      background-color: #d22727;
+      color: white;
+      padding: 12px;
+      width: 150px;
+      border: none;
+      font-size: 14px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+      -webkit-appearance: button;
+      appearance: button;
+      outline: none;
+    }
 
-        
-        .box:hover::before {
-          color: rgba(255, 255, 255, 0.6);
-          background-color: rgba(255, 255, 255, 0.2);
-        }
+    .box:hover::before {
+      color: rgba(255, 255, 255, 0.6);
+      background-color: rgba(255, 255, 255, 0.2);
+    }
 
-        .box select option {
-          padding: 30px;
-        }
-    </style>
-  </head>
-  <body>
-    <div class="map-container">
+    .box select option {
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="map-container">
     <div class="container">
       <div class="box">
         <label for="year">Choisir l'année:</label>
@@ -96,14 +91,14 @@
         /><br />
         <span id="an">Année : 2021</span>
       </div>
-      
+
       <div class="box">
         <label for="product">Choisir le produit:</label>
         <select id="product" name="product">
           <!-- Options dynamiques en fonction des données -->
         </select>
       </div>
-  
+
       <div class="box">
         <label for="element">Choisir l'élément:</label>
         <select id="element" name="element">
@@ -111,175 +106,176 @@
         </select>
       </div>
     </div>
-      <div id="map" class="map"></div>
-      <!-- Ajout de la légende existante -->
-      <div class="map-legend">
-        <div>
-          <p>Cette carte représente ....</p>
-        </div>
+    <div id="map" class="map"></div>
+    <!-- Ajout de la légende existante -->
+    <div class="map-legend">
+      <div>
+        <p>Cette carte représente ....</p>
       </div>
     </div>
-    
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script>
-      var largeur = 1500;
-      var hauteur = 700;
+  </div>
 
-      var projection = d3
-        .geoMercator()
-        .scale(((largeur + 1) / 2 / Math.PI) * 0.7)
-        .translate([largeur / 2, hauteur / 2])
-        .precision(0.1)
-        .center([0, 0]);
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script>
+    var largeur = 1500;
+    var hauteur = 700;
 
-      var chemin = d3.geoPath().projection(projection);
+    var projection = d3
+      .geoMercator()
+      .scale(((largeur + 1) / 2 / Math.PI) * 0.7)
+      .translate([largeur / 2, hauteur / 2])
+      .precision(0.1)
+      .center([0, 0]);
 
-      var svg = d3
-        .select("body")
-        .append("svg")
-        .attr("width", largeur)
-        .attr("height", hauteur);
+    var chemin = d3.geoPath().projection(projection);
 
-      d3.csv("FAOSTAT_data_en_1-11-2024.csv").then(function (donnees) {
-        d3.json("custom.geo.json").then(function (monde) {
-          monde.features.forEach(function (paysMonde) {
-            var donneesPays = donnees.find(function (csvPays) {
-              return csvPays["Area"] === paysMonde.properties.name;
-            });
-            if (donneesPays) {
-              paysMonde.properties.data = donneesPays;
-            }
+    var svg = d3
+      .select("body")
+      .append("svg")
+      .attr("width", largeur)
+      .attr("height", hauteur);
+
+    d3.csv("FAOSTAT_data_en_1-11-2024.csv").then(function (donnees) {
+      d3.json("custom.geo.json").then(function (monde) {
+        monde.features.forEach(function (paysMonde) {
+          var donneesPays = donnees.find(function (csvPays) {
+            return csvPays["Area"] === paysMonde.properties.name;
           });
-
-          var echelleCouleur = d3.scaleSequential(d3.interpolateReds).domain([
-            d3.min(donnees, function (d) {
-              return +d.Value;
-            }),
-            d3.max(donnees, function (d) {
-              return +d.Value;
-            }),
-          ]);
-
-          svg
-            .selectAll("path")
-            .data(monde.features)
-            .enter()
-            .append("path")
-            .attr("d", chemin)
-            .style("fill", function (d) {
-              return d.properties.data
-                ? echelleCouleur(+d.properties.data.Value)
-                : "#003e1c";
-            })
-            .style("stroke", "#fff")
-            .style("stroke-width", 1);
-
-          // Légende
-          var legende = svg
-            .selectAll(".legende")
-            .data(echelleCouleur.ticks(6).slice(1))
-            .enter()
-            .append("g")
-            .attr("class", "legende")
-            .attr("transform", function (d, i) {
-              return "translate(0," + (hauteur - 20 - i * 20) + ")";
-            });
-
-          legende
-            .append("rect")
-            .attr("width", 18)
-            .attr("height", 18)
-            .style("fill", echelleCouleur);
-
-          legende
-            .append("text")
-            .attr("x", 26)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .style("text-anchor", "start")
-            .text(function (d) {
-              return "≥ " + Math.round(d);
-            });
-
-          // Obtenez la liste unique des produits
-          var produits = Array.from(new Set(donnees.map((d) => d.Item)));
-
-          // Remplissez le menu déroulant des produits
-          var selectProduct = d3.select("#product");
-          selectProduct
-            .selectAll("option")
-            .data(produits)
-            .enter()
-            .append("option")
-            .text(function (d) {
-              return d;
-            });
-
-          // Obtenez la liste unique des éléments (import, export, production)
-          var elements = Array.from(
-            new Set(donnees.map((d) => d["Element Code"]))
-          );
-
-          // Remplissez le menu déroulant des éléments
-          var selectElement = d3.select("#element");
-          selectElement
-            .selectAll("option")
-            .data(elements)
-            .enter()
-            .append("option")
-            .text(function (d) {
-              return d;
-            });
-
-          // Gérez le changement de l'année dans le slider
-          var yText = d3.select("#an");
-          d3.select("#year").on("input", function () {
-            var selectedYear = this.value;
-            var selectedProduct = selectProduct.property("value");
-            var selectedElement = selectElement.property("value");
-            yText.text("Année : " + selectedYear);
-            updateMap(selectedYear, selectedProduct, selectedElement);
-          });
-
-          // Gérez le changement de sélection dans le menu déroulant des produits
-          selectProduct.on("change", function () {
-            var selectedYear = d3.select("#year").property("value");
-            var selectedProduct = this.value;
-            var selectedElement = selectElement.property("value");
-            updateMap(selectedYear, selectedProduct, selectedElement);
-          });
-
-          // Gérez le changement de sélection dans le menu déroulant des éléments
-          selectElement.on("change", function () {
-            var selectedYear = d3.select("#year").property("value");
-            var selectedProduct = selectProduct.property("value");
-            var selectedElement = this.value;
-            updateMap(selectedYear, selectedProduct, selectedElement);
-          });
-
-          // Fonction pour mettre à jour la carte en fonction de l'année, du produit et de l'élément sélectionnés
-          function updateMap(selectedYear, selectedProduct, selectedElement) {
-            svg.selectAll("path").style("fill", function (d) {
-              return d.properties.data &&
-                d.properties.data.Year === selectedYear &&
-                d.properties.data.Item === selectedProduct &&
-                d.properties.data["Element Code"] === selectedElement
-                ? echelleCouleur(+d.properties.data.Value)
-                : d.properties.data &&
-                  d.properties.data.Year === selectedYear &&
-                  d.properties.data["Element Code"] === selectedElement
-                ? echelleCouleur(+d.properties.data.Value)
-                : "#6b0000";
-            });
+          if (donneesPays) {
+            paysMonde.properties.data = donneesPays;
           }
-
-
-
-
-          // Initialiser la carte avec l'année, le produit et l'élément par défaut
-          updateMap(2021, produits[0], elements[0]);
         });
+
+        var echelleCouleur = d3.scaleSequential(d3.interpolateReds).domain([
+          d3.min(donnees, function (d) {
+            return +d.Value;
+          }),
+          d3.max(donnees, function (d) {
+            return +d.Value;
+          }),
+        ]);
+
+        svg
+          .selectAll("path")
+          .data(monde.features)
+          .enter()
+          .append("path")
+          .attr("d", chemin)
+          .style("fill", function (d) {
+            return d.properties.data
+              ? echelleCouleur(+d.properties.data.Value)
+              : "#003e1c";
+          })
+          .style("stroke", "#fff")
+          .style("stroke-width", 1);
+
+        // Légende
+        var legende = svg
+          .selectAll(".legende")
+          .data(echelleCouleur.ticks(6).slice(1))
+          .enter()
+          .append("g")
+          .attr("class", "legende")
+          .attr("transform", function (d, i) {
+            return "translate(0," + (hauteur - 20 - i * 20) + ")";
+          });
+
+        legende
+          .append("rect")
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", echelleCouleur);
+
+        legende
+          .append("text")
+          .attr("x", 26)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "start")
+          .text(function (d) {
+            return "≥ " + Math.round(d);
+          });
+
+        // Obtenez la liste unique des produits
+        var produits = Array.from(new Set(donnees.map((d) => d.Item)));
+
+        // Remplissez le menu déroulant des produits
+        var selectProduct = d3.select("#product");
+        selectProduct
+          .selectAll("option")
+          .data(produits)
+          .enter()
+          .append("option")
+          .text(function (d) {
+            return d;
+          });
+
+        // Obtenez la liste unique des éléments (import, export, production)
+        var elements = Array.from(
+          new Set(donnees.map((d) => d["Element Code"]))
+        );
+
+        // Remplissez le menu déroulant des éléments
+        var selectElement = d3.select("#element");
+        selectElement
+          .selectAll("option")
+          .data(elements)
+          .enter()
+          .append("option")
+          .text(function (d) {
+            return d;
+          });
+
+        // Gérez le changement de l'année dans le slider
+        var yText = d3.select("#an");
+        d3.select("#year").on("input", function () {
+          var selectedYear = this.value;
+          var selectedProduct = selectProduct.property("value");
+          var selectedElement = selectElement.property("value");
+          yText.text("Année : " + selectedYear);
+          updateMap(selectedYear, selectedProduct, selectedElement);
+        });
+
+        // Gérez le changement de sélection dans le menu déroulant des produits
+        selectProduct.on("change", function () {
+          var selectedYear = d3.select("#year").property("value");
+          var selectedProduct = this.value;
+          var selectedElement = selectElement.property("value");
+          updateMap(selectedYear, selectedProduct, selectedElement);
+        });
+
+        // Gérez le changement de sélection dans le menu déroulant des éléments
+        selectElement.on("change", function () {
+          var selectedYear = d3.select("#year").property("value");
+          var selectedProduct = selectProduct.property("value");
+          var selectedElement = this.value;
+          updateMap(selectedYear, selectedProduct, selectedElement);
+        });
+
+        // Fonction pour mettre à jour la carte en fonction de l'année, du produit et de l'élément sélectionnés
+function updateMap(selectedYear, selectedProduct, selectedElement) {
+  svg.selectAll("path").style("fill", function (d) {
+    return d.properties.data &&
+      d.properties.data.Year == selectedYear &&
+      d.properties.data.Item == selectedProduct &&
+      d.properties.data["Element Code"] == selectedElement
+      ? echelleCouleur(+d.properties.data.Value)
+      : d.properties.data &&
+        d.properties.data.Year == selectedYear &&
+        d.properties.data.Item == selectedProduct
+      ? echelleCouleur(+d.properties.data.Value)
+      : d.properties.data &&
+        d.properties.data.Year == selectedYear &&
+        d.properties.data["Element Code"] == selectedElement
+      ? echelleCouleur(+d.properties.data.Value)
+      : "#6b0000";
+  });
+}
+
+        // Initialiser la carte avec l'année, le produit et l'élément par défaut
+        updateMap(2021, produits[0], elements[0]);
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
