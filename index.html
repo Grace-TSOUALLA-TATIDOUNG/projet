@@ -164,7 +164,7 @@
           .style("fill", function (d) {
             return d.properties.data
               ? echelleCouleur(+d.properties.data.Value)
-              : "#003e1c";
+              : "#6b0000";
           })
           .style("stroke", "#fff")
           .style("stroke-width", 1);
@@ -252,26 +252,31 @@
           updateMap(selectedYear, selectedProduct, selectedElement);
         });
 
-        // Fonction pour mettre à jour la carte en fonction de l'année, du produit et de l'élément sélectionnés
-function updateMap(selectedYear, selectedProduct, selectedElement) {
-  svg.selectAll("path").style("fill", function (d) {
-    return d.properties.data &&
-      d.properties.data.Year == selectedYear &&
-      d.properties.data.Item == selectedProduct &&
-      d.properties.data["Element Code"] == selectedElement
-      ? echelleCouleur(+d.properties.data.Value)
-      : d.properties.data &&
-        d.properties.data.Year == selectedYear &&
-        d.properties.data.Item == selectedProduct
-      ? echelleCouleur(+d.properties.data.Value)
-      : d.properties.data &&
-        d.properties.data.Year == selectedYear &&
-        d.properties.data["Element Code"] == selectedElement
-      ? echelleCouleur(+d.properties.data.Value)
-      : "#6b0000";
+       // Fonction pour filtrer les données en fonction de l'année, du produit et de l'élément sélectionnés
+function filterData(selectedYear, selectedProduct, selectedElement) {
+  return donnees.filter(function (d) {
+    return (
+      d.Year == selectedYear &&
+      (!selectedProduct || d.Item == selectedProduct) &&
+      (!selectedElement || d["Element Code"] == selectedElement)
+    );
   });
 }
 
+// Fonction pour mettre à jour la carte en fonction de l'année, du produit et de l'élément sélectionnés
+function updateMap(selectedYear, selectedProduct, selectedElement) {
+  var filteredData = filterData(selectedYear, selectedProduct, selectedElement);
+
+  svg.selectAll("path").style("fill", function (d) {
+    var dataForCountry = filteredData.find(function (data) {
+      return data.Area == d.properties.name;
+    });
+
+    return dataForCountry
+      ? echelleCouleur(+dataForCountry.Value)
+      : "#6b0000";
+  });
+}
         // Initialiser la carte avec l'année, le produit et l'élément par défaut
         updateMap(2021, produits[0], elements[0]);
       });
