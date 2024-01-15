@@ -1,5 +1,6 @@
 
 Le problème abordé dans la visualisation :
+
 La  visualisation suivante constitue une fenêtre immersive sur l'approvisionnement mondial, elle offre une vision détaillée des quantités échangées et produites pour une multitude de produits. 
 En scrutant la carte interactive, les utilisateurs peuvent aisément détecter les pulsations économiques et les zones géographiques influentes dans l'exportation, l'importation et la production de divers biens au fil des années. 
 Que ce soit les pics lumineux de l'exportation de café en Amérique du Sud, les flux constants d'importation de technologie en Asie ou la croissance spectaculaire de la production de céréales en Europe, chaque région du monde devient une histoire visuelle, révélant les tendances économiques mondiales et fournissant un aperçu précieux pour des prises de décision stratégiques dans le contexte du commerce international et de l'agriculture.
