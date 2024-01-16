@@ -34,6 +34,7 @@
       align-items: center;
       justify-content: center;
       background-color: white;
+      font-size: 20px;
     }
 
     .container {
@@ -46,7 +47,7 @@
 
     .box {
       margin-right: 5%;
-      margin-top: 3%;
+      margin-top: 2%;
       transform: translate(-50%, -50%);
     }
 
@@ -135,7 +136,7 @@
     <!-- Ajout de la légende existante -->
     <div class="map-legend">
       <div>
-        <p>Cette carte représente ....</p>
+        <p><strong>Flux Mondiaux d'Approvisionnement Agricole : Exportations, Importations, et Production (2017-2021)</strong></p>
       </div>
     </div>
   </div>
@@ -248,6 +249,17 @@
             d3.select(this).classed("hovered", false);
             d3.select(this).select(".country-label").style("display", "none");
           });
+
+          
+svg
+  .append("text")
+  .attr("x", largeur - 10)  // Ajustez la position en fonction de votre mise en page
+  .attr("y", hauteur - 10)  // Ajustez la position en fonction de votre mise en page
+  .style("text-anchor", "end")
+  .style("font-size", "10px")  // Ajustez la taille de la police selon vos préférences
+  .style("fill", "#555")  // Couleur du texte
+  .text("Source: FAO Stat - https://www.fao.org/faostat/en/");
+
 
               // Ajout d'une rose des vents stylisée en haut de la carte
           var compassRadius = 20; // Ajustez la taille de la rose des vents selon vos besoins
