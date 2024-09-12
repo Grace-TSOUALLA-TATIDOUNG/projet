@@ -1,50 +1,415 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carte du Monde avec D3.js</title>
-    <style>
-        path {
-            fill: #ccc;
-            stroke: #fff;
-            stroke-width: 1;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte du Monde avec D3.js</title>
+  <style>
+    path {
+      fill: #00261C; 
+      stroke: #97ED8A;
+      stroke-width: 1;
+    }
+
+    .legend {
+      font-size: 12px;
+      
+    }
+
+    .legend rect {
+      width: 18px;
+      height: 18px;
+      margin-right: 4px;
+      opacity: 0.8;
+    }
+
+    .map-container {
+      position: relative;
+    }
+
+    
+    .map-legend {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+      font-size: 20px;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      left: 350px;
+    }
+
+    /* style du dropdown */
+
+    .box {
+      margin-right: 5%;
+      margin-top: 2%;
+      transform: translate(-50%, -50%);
+    }
+
+    .box select {
+      background-color:#044D29;
+      color: white;
+      padding: 12px;
+      width: 160px;
+      border: none;
+      font-size: 14px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+      -webkit-appearance: button;
+      appearance: button;
+      outline: none;
+    }
+
+    .box:hover::before {
+      color: rgba(255, 255, 255, 0.6);
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .box select option {
+      padding: 30px;
+    }
+
+    .country-label {
+      fill: #888888;
+      font-size: 10px;
+      text-anchor: middle;
+      display: none; /* Initialement masqué */
+    }
+
+    .country:hover .country-label {
+      display: block;
+    }
+
+    .country.hovered {
+      fill-opacity: 1; /* Ajustez l'opacité lors du survol */
+    }
+
+    .compass line {
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.compass circle {
+  fill: #000;
+}
+
+
+   
+  </style>
 </head>
 <body>
+  <div class="map-container">
+    <div class="container">
+      <div class="box">
+        <label for="year">Choisir l'année:</label>
+        <input
+          type="range"
+          id="year"
+          name="year"
+          min="2017"
+          max="2021"
+          step="1"
+          value="2021"
+        /><br />
+        <span id="an">Année : 2021</span>
+      </div>
 
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script>
+      <div class="box">
+        <label for="product">Choisir le produit:</label>
+        <select id="product" name="product">
+          <!-- Options dynamiques en fonction des données -->
+        </select>
+      </div>
 
-        // Définir les dimensions de la carte
-        var width =1200;
-        var height = 700;  // Augmentez la hauteur pour éviter de couper le haut de la carte
+      <div class="box">
+        <label for="element">Choisir l'élément:</label>
+        <select id="element" name="element">
+          <!-- Ajoutez ici les options dynamiques en fonction de vos données -->
+        </select>
+      </div>
+    </div>
+    <div id="map" class="map"></div>
+    <!-- Ajout de la légende existante -->
+    <div class="map-legend">
+      <div>
+        <p><strong>Flux Mondiaux d'Approvisionnement Agricole : Exportations, Importations, et Production (2017-2021)</strong></p>
+      </div>
+    </div>
+  </div>
 
-        // Définir la projection
-        var projection = d3.geoMercator()
-            .scale((width + 1) / 2 / Math.PI *0.7)  // Ajuster l'échelle
-            .translate([width / 2, height / 2])
-            .precision(0.1)
-            .center([0, 0]);  // Centrer la carte sur l'équateur, ajustez selon les besoins
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script>
+    var largeur = 1500;
+    var hauteur = 525;
 
-        // Appliquer la projection aux chemins des frontières
-        var path = d3.geoPath().projection(projection);
+    var projection = d3
+      .geoMercator()
+      .scale(((largeur + 1) / 2 / Math.PI) * 0.5)
+      .translate([largeur / 2, hauteur / 2])
+      .precision(0.1)
+      .center([0, 0]);
 
-        // Sélectionner le conteneur SVG
-        var svg = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height", height);
+    var chemin = d3.geoPath().projection(projection);
 
-        // Utiliser D3 pour charger le fichier GeoJSON
-        d3.json("custom.geo.json").then(function(world) {
-            // Utiliser D3 pour créer les chemins des frontières
-            svg.selectAll("path")
-                .data(world.features)
-                .enter().append("path")
-                .attr("d", path);
+    var svg = d3
+      .select("body")
+      .append("svg")
+      .attr("width", largeur)
+      .attr("height", hauteur);
+
+    d3.csv("FAOSTAT_data_en_1-11-2024.csv").then(function (donnees) {
+      d3.json("custom.geo.json").then(function (monde) {
+        monde.features.forEach(function (paysMonde) {
+          var donneesPays = donnees.find(function (csvPays) {
+            return csvPays["Area"] === paysMonde.properties.name;
+          });
+          if (donneesPays) {
+            paysMonde.properties.data = donneesPays;
+          }
         });
 
-    </script>
+        var echelleCouleur = d3.scaleSequential(d3.interpolateGreens).domain([
+          d3.min(donnees, function (d) {
+            return +d.Value;
+          }),
+          d3.max(donnees, function (d) {
+            return +d.Value;
+          }),
+        ]);
+
+        svg
+          .selectAll("path")
+          .data(monde.features)
+          .enter()
+          .append("path")
+          .attr("d", chemin)
+          .style("fill", function (d) {
+            return d.properties.data
+              ? echelleCouleur(+d.properties.data.Value)
+              : "#6b0000";
+          })
+          .style("stroke", "#fff")
+          .style("stroke-width", 1);
+
+                  // Dessiner les frontières
+        svg
+          .selectAll(".border")
+          .data(monde.features)
+          .enter()
+          .append("path")
+          .attr("class", "border")
+          .attr("d", chemin)
+          .style("fill", "none")
+          .style("stroke", "#888")
+          .style("stroke-width", 1);
+
+        // Dessiner les pays
+        svg
+          .selectAll(".country")
+          .data(monde.features)
+          .enter()
+          .append("g")
+          .attr("class", "country")
+          .append("path")
+          .attr("d", chemin)
+          .style("fill", function (d) {
+            return d.properties.data
+              ? echelleCouleur(+d.properties.data.Value)
+              : "#003e1c";
+          })
+          .style("stroke", "#888")
+          .style("stroke-width", 0.2);
+
+        // Dessiner les noms des pays
+        svg
+          .selectAll(".country")
+          .append("text")
+          .attr("class", "country-label")
+          .attr("transform", function (d) {
+            return "translate(" + chemin.centroid(d) + ")";
+          })
+          .attr("dy", ".35em")
+          .style("display", "none")
+          .text(function (d) {
+            return d.properties.name;
+          });
+
+        // Gérer les événements de survol pour les noms des pays
+        svg
+          .selectAll(".country")
+          .on("mouseover", function (event, d) {
+            d3.select(this).classed("hovered", true);
+            d3.select(this).select(".country-label").style("display", "block");
+          })
+          .on("mouseout", function (event, d) {
+            d3.select(this).classed("hovered", false);
+            d3.select(this).select(".country-label").style("display", "none");
+          });
+
+          
+svg
+  .append("text")
+  .attr("x", largeur - 10)  // Ajustez la position en fonction de votre mise en page
+  .attr("y", hauteur - 10)  // Ajustez la position en fonction de votre mise en page
+  .style("text-anchor", "end")
+  .style("font-size", "10px")  // Ajustez la taille de la police selon vos préférences
+  .style("fill", "#555")  // Couleur du texte
+  .text("Source: FAO Stat - https://www.fao.org/faostat/en/");
+
+
+              // Ajout d'une rose des vents stylisée en haut de la carte
+          var compassRadius = 20; // Ajustez la taille de la rose des vents selon vos besoins
+
+          var compass = svg.append("g")
+            .attr("class", "compass")
+            .attr("transform", "translate(" + (largeur / 2) + "," + 20 + ")");
+
+          var directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+
+          // Ajout des lignes représentant les directions cardinales
+          compass.selectAll("line")
+            .data(directions)
+            .enter().append("line")
+            .attr("x1", 0)
+            .attr("y1", -compassRadius)
+            .attr("x2", 0)
+            .attr("y2", -compassRadius + 10)
+            .attr("transform", function(d, i) { return "rotate(" + (i * 45) + ")"; }) // Rotation des lignes
+            .style("stroke", "#000")
+            .style("stroke-width", 2);
+
+          // Ajout des textes représentant les directions cardinales
+          compass.selectAll("text")
+            .data(directions)
+            .enter().append("text")
+            .attr("x", 0)
+            .attr("y", -compassRadius - 15)
+            .attr("dy", function(d, i) { return i * (compassRadius / 4); })
+            .attr("text-anchor", "middle")
+            .text(function(d) { return d; })
+            .style("fill", "#000")
+            .style("font-size", "0px");
+
+
+        // Légende
+        var legende = svg
+          .selectAll(".legende")
+          .data(echelleCouleur.ticks(6).slice(1))
+          .enter()
+          .append("g")
+          .attr("class", "legende")
+          .attr("transform", function (d, i) {
+            return "translate(0," + (hauteur - 20 - i * 20) + ")";
+          });
+
+        
+
+        legende
+          .append("rect")
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", echelleCouleur);
+
+        legende
+          .append("text")
+          .attr("x", 26)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "start")
+          .text(function (d) {
+            return "≥ " + Math.round(d);
+          });
+
+        // Obtenez la liste unique des produits
+        var produits = Array.from(new Set(donnees.map((d) => d.Item)));
+
+        // Remplissez le menu déroulant des produits
+        var selectProduct = d3.select("#product");
+        selectProduct
+          .selectAll("option")
+          .data(produits)
+          .enter()
+          .append("option")
+          .text(function (d) {
+            return d;
+          });
+
+        // Obtenez la liste unique des éléments (import, export, production)
+        var elements = Array.from(
+          new Set(donnees.map((d) => d["Element"]))
+        );
+
+        // Remplissez le menu déroulant des éléments
+        var selectElement = d3.select("#element");
+        selectElement
+          .selectAll("option")
+          .data(elements)
+          .enter()
+          .append("option")
+          .text(function (d) {
+            return d;
+          });
+
+        // Gérez le changement de l'année dans le slider
+        var yText = d3.select("#an");
+        d3.select("#year").on("input", function () {
+          var selectedYear = this.value;
+          var selectedProduct = selectProduct.property("value");
+          var selectedElement = selectElement.property("value");
+          yText.text("Année : " + selectedYear);
+          updateMap(selectedYear, selectedProduct, selectedElement);
+        });
+
+        // Gérez le changement de sélection dans le menu déroulant des produits
+        selectProduct.on("change", function () {
+          var selectedYear = d3.select("#year").property("value");
+          var selectedProduct = this.value;
+          var selectedElement = selectElement.property("value");
+          updateMap(selectedYear, selectedProduct, selectedElement);
+        });
+
+        // Gérez le changement de sélection dans le menu déroulant des éléments
+        selectElement.on("change", function () {
+          var selectedYear = d3.select("#year").property("value");
+          var selectedProduct = selectProduct.property("value");
+          var selectedElement = this.value;
+          updateMap(selectedYear, selectedProduct, selectedElement);
+        });
+
+        // Fonction pour filtrer les données en fonction de l'année, du produit et de l'élément sélectionnés
+        function filterData(selectedYear, selectedProduct, selectedElement) {
+          return donnees.filter(function (d) {
+            return (
+              d.Year == selectedYear &&
+              (!selectedProduct || d.Item == selectedProduct) &&
+              (!selectedElement || d["Element"] == selectedElement)
+            );
+          });
+        }
+
+        // Fonction pour mettre à jour la carte en fonction de l'année, du produit et de l'élément sélectionnés
+        function updateMap(selectedYear, selectedProduct, selectedElement) {
+          var filteredData = filterData(selectedYear, selectedProduct, selectedElement);
+
+          svg.selectAll("path").style("fill", function (d) {
+            var dataForCountry = filteredData.find(function (data) {
+              return data.Area == d.properties.name;
+            });
+
+            return dataForCountry
+              ? echelleCouleur(+dataForCountry.Value)
+              : "#00261C";
+          });
+        }
+
+        // Initialiser la carte avec l'année, le produit et l'élément par défaut
+        updateMap(2021, produits[0], elements[0]);
+      });
+    });
+  </script>
 </body>
 </html>
